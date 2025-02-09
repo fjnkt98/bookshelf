@@ -20,3 +20,14 @@ async fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod test {
+    use crate::health_check;
+
+    #[tokio::test]
+    async fn health_check_works() {
+        let status_code = health_check().await;
+        assert_eq!(status_code, axum::http::StatusCode::OK);
+    }
+}
