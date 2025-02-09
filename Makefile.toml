@@ -13,7 +13,7 @@ PORT = 18080
 REDIS_PORT_INNER = 6379
 REDIS_PORT_OUTER = 6379
 
-[tasks.set-end-docker.env]
+[tasks.set-env-docker.env]
 DATABASE_HOST = "postgres"
 DATABASE_PORT = "${DATABASE_PORT_INNER}"
 DATABASE_URL = "postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?user=${DATABASE_USERNAME}&password=${DATABASE_PASSWORD}"
