@@ -32,7 +32,7 @@ REDIS_HOST = "localhost"
 REDIS_PORT = "${REDIS_PORT_OUTER}"
 
 [tasks.before-build]
-run_task = [{ name = ["compose-up-db", "compose-up-redis"] }]
+run_task = [{ name = ["compose-up-db", "migrate", "compose-up-redis"] }]
 
 [tasks.compose-build-app]
 extend = "set-env-local"
@@ -91,6 +91,16 @@ args = ["fmt", "--all", "${@}"]
 extend = "set-env-local"
 command = "cargo"
 args = ["clippy", "--all", "--all-targets", "${@}"]
+
+[tasks.sql-lint]
+extend = "set-env-local"
+command = "uvx"
+args = ["sqlfluff", "lint", "${@}"]
+
+[tasks.sql-fix]
+extend = "set-env-local"
+command = "uvx"
+args = ["sqlfluff", "fix", "${@}"]
 
 [tasks.test]
 install_crate = { crate_name = "cargo-nextest", binary = "cargo", test_arg = [
