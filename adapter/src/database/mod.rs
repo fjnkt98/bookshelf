@@ -1,3 +1,5 @@
+pub mod model;
+
 fn make_pg_connect_options(
     config: &shared::config::DatabaseConfig,
 ) -> sqlx::postgres::PgConnectOptions {
@@ -15,6 +17,10 @@ pub struct ConnectionPool(sqlx::pool::Pool<sqlx::Postgres>);
 impl ConnectionPool {
     pub fn inner_ref(&self) -> &sqlx::pool::Pool<sqlx::Postgres> {
         &self.0
+    }
+
+    pub fn new(pool: sqlx::pool::Pool<sqlx::Postgres>) -> Self {
+        Self(pool)
     }
 }
 
