@@ -1,14 +1,21 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+#[derive(Clone)]
+pub struct AppRegistry {
+    health_check_repository: std::sync::Arc<dyn kernel::repository::health::HealthCheckRepository>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl AppRegistry {
+    pub fn new(pool: adapter::database::ConnectionPool) -> Self {
+        let health_check_repository = std::sync::Arc::new(
+            adapter::repository::health::HealthCheckRepositoryImpl::new(pool.clone()),
+        );
+        Self {
+            health_check_repository,
+        }
+    }
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    pub fn health_check_repository(
+        &self,
+    ) -> std::sync::Arc<dyn kernel::repository::health::HealthCheckRepository> {
+        self.health_check_repository.clone()
     }
 }
