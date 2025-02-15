@@ -1,4 +1,5 @@
 use anyhow::Context;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -37,7 +38,6 @@ async fn bootstrap() -> anyhow::Result<()> {
     let app = axum::Router::new()
         .merge(api::route::health::build_health_check_routers())
         .merge(api::route::book::build_book_routers())
-        .layer(tower_http::cors())
         .layer(
             tower_http::trace::TraceLayer::new_for_http()
                 .make_span_with(
