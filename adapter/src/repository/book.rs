@@ -5,7 +5,10 @@ pub struct BookRepositoryImpl {
 
 #[async_trait::async_trait]
 impl kernel::repository::book::BookRepository for BookRepositoryImpl {
-    async fn create(&self, event: kernel::model::book::event::CreateBook) -> anyhow::Result<()> {
+    async fn create(
+        &self,
+        event: kernel::model::book::event::CreateBook,
+    ) -> shared::error::AppResult<()> {
         sqlx::query!(
             r#"
             INSERT INTO books (title, author, isbn, description)
@@ -17,12 +20,13 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
             event.description,
         )
         .execute(self.db.inner_ref())
-        .await?;
+        .await
+        .map_err(shared::error::AppError::SpecificOperationError)?;
 
         Ok(())
     }
 
-    async fn find_all(&self) -> anyhow::Result<Vec<kernel::model::book::Book>> {
+    async fn find_all(&self) -> shared::error::AppResult<Vec<kernel::model::book::Book>> {
         let rows: Vec<crate::database::model::book::BookRow> = sqlx::query_as!(
             crate::database::model::book::BookRow,
             r#"
@@ -39,7 +43,8 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
             "#,
         )
         .fetch_all(self.db.inner_ref())
-        .await?;
+        .await
+        .map_err(shared::error::AppError::SpecificOperationError)?;
 
         Ok(rows
             .into_iter()
@@ -50,7 +55,7 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
     async fn find_by_id(
         &self,
         book_id: uuid::Uuid,
-    ) -> anyhow::Result<Option<kernel::model::book::Book>> {
+    ) -> shared::error::AppResult<Option<kernel::model::book::Book>> {
         let row: Option<crate::database::model::book::BookRow> = sqlx::query_as!(
             crate::database::model::book::BookRow,
             r#"
@@ -68,7 +73,8 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
             book_id,
         )
         .fetch_optional(self.db.inner_ref())
-        .await?;
+        .await
+        .map_err(shared::error::AppError::SpecificOperationError)?;
 
         Ok(row.map(kernel::model::book::Book::from))
     }

@@ -1,15 +1,3 @@
-#[derive(thiserror::Error, Debug)]
-pub enum AppError {
-    #[error(" {0} ")]
-    InternalError(#[from] anyhow::Error),
-}
-
-impl axum::response::IntoResponse for AppError {
-    fn into_response(self) -> axum::response::Response {
-        (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "").into_response()
-    }
-}
-
 pub async fn register_book(
     registry: axum::extract::State<registry::AppRegistry>,
     axum::Json(req): axum::Json<crate::model::book::CreateBookRequest>,
