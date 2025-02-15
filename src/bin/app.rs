@@ -11,6 +11,7 @@ async fn bootstrap() -> anyhow::Result<()> {
 
     let app = axum::Router::new()
         .merge(api::route::health::build_health_check_routers())
+        .merge(api::route::book::build_book_routers())
         .with_state(registry);
 
     let addr = std::net::SocketAddr::new(std::net::Ipv4Addr::LOCALHOST.into(), 8080);
