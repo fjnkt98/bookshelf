@@ -76,11 +76,11 @@ dependencies = ["before-build"]
 command = "cargo"
 args = ["check"]
 
-# [tasks.watch]
-# extend = "set-env-local"
-# dependencies = ["before-build"]
-# run_task = [{ name = ["fmt", "clippy", "test"] }]
-# watch = true
+[tasks.watch]
+extend = "set-env-local"
+dependencies = ["before-build"]
+run_task = [{ name = ["fmt", "clippy", "test"] }]
+watch = true
 
 [tasks.fmt]
 extend = "set-env-local"
