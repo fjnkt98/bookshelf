@@ -54,7 +54,7 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
 
     async fn find_by_id(
         &self,
-        book_id: uuid::Uuid,
+        book_id: kernel::model::id::BookId,
     ) -> shared::error::AppResult<Option<kernel::model::book::Book>> {
         let row: Option<crate::database::model::book::BookRow> = sqlx::query_as!(
             crate::database::model::book::BookRow,
@@ -70,7 +70,7 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
             WHERE
                 book_id = $1
             "#,
-            book_id,
+            book_id as _,
         )
         .fetch_optional(self.db.inner_ref())
         .await

@@ -1,5 +1,5 @@
 pub struct BookRow {
-    pub book_id: uuid::Uuid,
+    pub book_id: kernel::model::id::BookId,
     pub title: String,
     pub author: String,
     pub isbn: String,

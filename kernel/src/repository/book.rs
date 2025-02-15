@@ -7,6 +7,6 @@ pub trait BookRepository: Send + Sync {
     async fn find_all(&self) -> shared::error::AppResult<Vec<crate::model::book::Book>>;
     async fn find_by_id(
         &self,
-        book_id: uuid::Uuid,
+        book_id: crate::model::id::BookId,
     ) -> shared::error::AppResult<Option<crate::model::book::Book>>;
 }

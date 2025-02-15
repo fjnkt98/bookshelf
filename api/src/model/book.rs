@@ -27,7 +27,7 @@ impl From<CreateBookRequest> for kernel::model::book::event::CreateBook {
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BookResponse {
-    pub id: uuid::Uuid,
+    pub id: kernel::model::id::BookId,
     pub title: String,
     pub author: String,
     pub isbn: String,
