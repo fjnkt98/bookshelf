@@ -1,6 +1,6 @@
 [sqlfluff]
 dialect = postgres
-exclude_rules = ambiguous.column_count, structure.column_order, layout.cte_newline
+exclude_rules = ambiguous.column_count, structure.column_order, layout.cte_newline, references.keywords
 max_line_length = 120
 processes = -1
 
