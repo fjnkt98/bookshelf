@@ -1,10 +1,15 @@
-#[derive(derive_new::new)]
+use crate::database::ConnectionPool;
+use async_trait::async_trait;
+use derive_new::new;
+use kernel::repository::health::HealthCheckRepository;
+
+#[derive(new)]
 pub struct HealthCheckRepositoryImpl {
-    db: crate::database::ConnectionPool,
+    db: ConnectionPool,
 }
 
-#[async_trait::async_trait]
-impl kernel::repository::health::HealthCheckRepository for HealthCheckRepositoryImpl {
+#[async_trait]
+impl HealthCheckRepository for HealthCheckRepositoryImpl {
     async fn check_db(&self) -> bool {
         sqlx::query("SELECT 1")
             .execute(self.db.inner_ref())

@@ -1,14 +1,23 @@
-#[derive(derive_new::new)]
+use crate::database::{model::book::BookRow, ConnectionPool};
+use async_trait::async_trait;
+use derive_new::new;
+use kernel::{
+    model::{
+        book::{event::CreateBook, Book},
+        id::BookId,
+    },
+    repository::book::BookRepository,
+};
+use shared::error::{AppError, AppResult};
+
+#[derive(new)]
 pub struct BookRepositoryImpl {
-    db: crate::database::ConnectionPool,
+    db: ConnectionPool,
 }
 
-#[async_trait::async_trait]
-impl kernel::repository::book::BookRepository for BookRepositoryImpl {
-    async fn create(
-        &self,
-        event: kernel::model::book::event::CreateBook,
-    ) -> shared::error::AppResult<()> {
+#[async_trait]
+impl BookRepository for BookRepositoryImpl {
+    async fn create(&self, event: CreateBook) -> AppResult<()> {
         sqlx::query!(
             r#"
             INSERT INTO books (title, author, isbn, description)
@@ -21,14 +30,14 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
         )
         .execute(self.db.inner_ref())
         .await
-        .map_err(shared::error::AppError::SpecificOperationError)?;
+        .map_err(AppError::SpecificOperationError)?;
 
         Ok(())
     }
 
-    async fn find_all(&self) -> shared::error::AppResult<Vec<kernel::model::book::Book>> {
-        let rows: Vec<crate::database::model::book::BookRow> = sqlx::query_as!(
-            crate::database::model::book::BookRow,
+    async fn find_all(&self) -> AppResult<Vec<Book>> {
+        let rows: Vec<BookRow> = sqlx::query_as!(
+            BookRow,
             r#"
             SELECT
                 book_id,
@@ -44,20 +53,14 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
         )
         .fetch_all(self.db.inner_ref())
         .await
-        .map_err(shared::error::AppError::SpecificOperationError)?;
+        .map_err(AppError::SpecificOperationError)?;
 
-        Ok(rows
-            .into_iter()
-            .map(kernel::model::book::Book::from)
-            .collect())
+        Ok(rows.into_iter().map(Book::from).collect())
     }
 
-    async fn find_by_id(
-        &self,
-        book_id: kernel::model::id::BookId,
-    ) -> shared::error::AppResult<Option<kernel::model::book::Book>> {
-        let row: Option<crate::database::model::book::BookRow> = sqlx::query_as!(
-            crate::database::model::book::BookRow,
+    async fn find_by_id(&self, book_id: BookId) -> AppResult<Option<Book>> {
+        let row: Option<BookRow> = sqlx::query_as!(
+            BookRow,
             r#"
             SELECT
                 book_id,
@@ -74,9 +77,9 @@ impl kernel::repository::book::BookRepository for BookRepositoryImpl {
         )
         .fetch_optional(self.db.inner_ref())
         .await
-        .map_err(shared::error::AppError::SpecificOperationError)?;
+        .map_err(AppError::SpecificOperationError)?;
 
-        Ok(row.map(kernel::model::book::Book::from))
+        Ok(row.map(Book::from))
     }
 }
 
@@ -90,9 +93,9 @@ mod test {
     async fn test_register_book(
         pool: sqlx::pool::Pool<sqlx::postgres::Postgres>,
     ) -> anyhow::Result<()> {
-        let repo = BookRepositoryImpl::new(crate::database::ConnectionPool::new(pool));
+        let repo = BookRepositoryImpl::new(ConnectionPool::new(pool));
 
-        let book = kernel::model::book::event::CreateBook {
+        let book = CreateBook {
             title: "Test Title".to_string(),
             author: "Test Author".to_string(),
             isbn: "Test ISBN".to_string(),
@@ -108,7 +111,7 @@ mod test {
         let res = repo.find_by_id(book_id).await?;
         assert!(res.is_some());
 
-        let kernel::model::book::Book {
+        let Book {
             id,
             title,
             author,

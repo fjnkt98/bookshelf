@@ -1,12 +1,14 @@
+use kernel::model::{book::Book, id::BookId};
+
 pub struct BookRow {
-    pub book_id: kernel::model::id::BookId,
+    pub book_id: BookId,
     pub title: String,
     pub author: String,
     pub isbn: String,
     pub description: String,
 }
 
-impl From<BookRow> for kernel::model::book::Book {
+impl From<BookRow> for Book {
     fn from(value: BookRow) -> Self {
         let BookRow {
             book_id,

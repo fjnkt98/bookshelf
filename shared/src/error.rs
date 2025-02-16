@@ -1,3 +1,5 @@
+use axum::response::{IntoResponse, Response};
+
 #[derive(thiserror::Error, Debug)]
 pub enum AppError {
     #[error(" {0} ")]
@@ -28,8 +30,8 @@ pub enum AppError {
     ConversionEntityError(String),
 }
 
-impl axum::response::IntoResponse for AppError {
-    fn into_response(self) -> axum::response::Response {
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
         let status_code = match self {
             AppError::UnprocessableEntity(_) => axum::http::StatusCode::UNPROCESSABLE_ENTITY,
             AppError::EntityNotFound(_) => axum::http::StatusCode::NOT_FOUND,
