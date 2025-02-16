@@ -1,3 +1,5 @@
+use shared::error::{AppError, AppResult};
+
 pub mod model;
 
 fn make_pg_connect_options(
@@ -21,6 +23,10 @@ impl ConnectionPool {
 
     pub fn new(pool: sqlx::pool::Pool<sqlx::Postgres>) -> Self {
         Self(pool)
+    }
+
+    pub async fn begin(&self) -> AppResult<sqlx::Transaction<'_, sqlx::Postgres>> {
+        self.0.begin().await.map_err(AppError::TransactionError)
     }
 }
 
